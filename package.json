@@ -1,0 +1,35 @@
+{
+  "name": "json-compare",
+  "version": "1.0.0",
+  "description": "A tool to compare two JSON files and highlight the differences",
+  "main": "src/json-compare.js",
+  "bin": {
+    "json-compare": "src/json-compare.js"
+  },
+  "scripts": {
+    "start": "node src/json-compare.js",
+    "test": "node tests/test-runner.js",
+    "lint": "echo 'Linting not configured yet'",
+    "example": "node src/json-compare.js examples/left.json examples/right.json"
+  },
+  "keywords": [
+    "json",
+    "compare",
+    "diff",
+    "comparison",
+    "cli"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/json-compare.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/json-compare/issues"
+  },
+  "homepage": "https://github.com/yourusername/json-compare#readme"
+}

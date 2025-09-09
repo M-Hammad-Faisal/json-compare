@@ -1,0 +1,13 @@
+{
+  "name": "John Doe",
+  "age": 31,
+  "city": "San Francisco",
+  "hobbies": ["reading", "cycling", "photography"],
+  "address": {
+    "street": "456 Oak Ave",
+    "zip": "10001",
+    "country": "USA"
+  },
+  "isEmployed": false,
+  "salary": 75000
+}
