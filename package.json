@@ -10,7 +10,8 @@
     "start": "node src/json-compare.js",
     "test": "node tests/test-runner.js",
     "lint": "echo 'Linting not configured yet'",
-    "example": "node src/json-compare.js examples/left.json examples/right.json"
+    "example": "node src/json-compare.js examples/left.json examples/right.json",
+    "web:open": "open web/index.html"
   },
   "keywords": [
     "json",
