@@ -41,12 +41,21 @@
         <span class="badge removed">Removed</span>
         <span class="badge type">Type change</span>
       </div>
-      <div id="diffList" class="diff-list"></div>
+      <div id="diffView" class="diff-view">
+        <div class="diff-header">
+          <div class="diff-column left-column">Left JSON</div>
+          <div class="diff-column right-column">Right JSON</div>
+        </div>
+        <div id="diffContent" class="diff-content"></div>
+      </div>
     </section>
   </main>
 
   <footer class="app-footer">
-    <small>Runs fully in your browser — no uploads. Built for this repo.</small>
+    <small>Runs fully in your browser — no uploads required.</small>
+    <div style="margin-top: 8px; color: #6c757d;">
+      Made with ❤️ by <a href="https://github.com/M-Hammad-Faisal" target="_blank" style="color: #667eea; text-decoration: none;">M-Hammad-Faisal</a>
+    </div>
   </footer>
 
   <script src="app.js"></script>

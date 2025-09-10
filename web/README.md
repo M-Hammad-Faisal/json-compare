@@ -2,6 +2,8 @@
 
 A beautiful web interface for comparing JSON files with Git-like diff visualization.
 
+🌐 **[Live Demo](https://m-hammad-faisal.github.io/json-compare/)**
+
 ## Features
 
 - 📁 **File Upload**: Load JSON files directly from your computer
@@ -47,3 +49,14 @@ npx serve .
 - Modern browsers with ES6+ support
 - JavaScript enabled
 - File API support for file uploads
+
+## GitHub Pages Deployment
+
+This web interface is automatically deployed to GitHub Pages. The deployment:
+- Uses GitHub Actions for automated builds
+- Deploys only the `/web` directory 
+- Available at: https://m-hammad-faisal.github.io/json-compare/
+
+---
+
+Made with ❤️ by [M-Hammad-Faisal](https://github.com/M-Hammad-Faisal)

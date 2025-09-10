@@ -141,7 +141,7 @@ class JsonCompareUI {
     this.status = document.getElementById('status');
     this.summary = document.getElementById('summary');
     this.results = document.getElementById('results');
-    this.diffList = document.getElementById('diffList');
+    this.diffContent = document.getElementById('diffContent');
   }
 
   attachEventListeners() {
@@ -279,104 +279,84 @@ class JsonCompareUI {
   }
 
   displayDetailedDifferences(differences) {
-    this.diffList.innerHTML = '';
-
-    differences.forEach((diff, index) => {
-      const diffItem = this.createDiffItem(diff, index + 1);
-      this.diffList.appendChild(diffItem);
-    });
-
+    // Get the original JSON strings for side-by-side display
+    const leftValue = this.leftText.value.trim();
+    const rightValue = this.rightText.value.trim();
+    
+    // Format the JSON for better readability
+    const leftJson = JSON.stringify(JSON.parse(leftValue), null, 2);
+    const rightJson = JSON.stringify(JSON.parse(rightValue), null, 2);
+    
+    this.createSideBySideDiff(leftJson, rightJson, differences);
     this.results.classList.remove('hidden');
   }
 
-  createDiffItem(diff, index) {
-    const item = document.createElement('div');
-    item.className = 'diff-item';
-
-    const path = document.createElement('div');
-    path.className = 'diff-path';
-    path.textContent = `${index}. ${diff.path}`;
-
-    const type = document.createElement('div');
-    type.className = 'diff-type';
-    type.appendChild(this.createTypeBadge(diff.type));
-
-    const values = document.createElement('div');
-    values.className = 'diff-values';
-    values.appendChild(this.createValueDisplay(diff));
-
-    item.appendChild(path);
-    item.appendChild(type);
-    item.appendChild(values);
-
-    return item;
-  }
-
-  createTypeBadge(type) {
-    const badge = document.createElement('span');
-    badge.className = 'badge';
+  createSideBySideDiff(leftText, rightText, differences) {
+    const leftLines = leftText.split('\n');
+    const rightLines = rightText.split('\n');
     
-    switch (type) {
-      case 'value_change':
-        badge.classList.add('changed');
-        badge.textContent = 'Changed';
-        break;
-      case 'added':
-        badge.classList.add('added');
-        badge.textContent = 'Added';
-        break;
-      case 'removed':
-        badge.classList.add('removed');
-        badge.textContent = 'Removed';
-        break;
-      case 'type_change':
-        badge.classList.add('type');
-        badge.textContent = 'Type change';
-        break;
+    // Create a map of changed paths for quick lookup
+    const changedPaths = new Map();
+    differences.forEach(diff => {
+      changedPaths.set(diff.path, diff.type);
+    });
+    
+    this.diffContent.innerHTML = '';
+    
+    const maxLines = Math.max(leftLines.length, rightLines.length);
+    
+    for (let i = 0; i < maxLines; i++) {
+      const leftLine = leftLines[i] || '';
+      const rightLine = rightLines[i] || '';
+      
+      // Determine line type
+      let lineType = 'unchanged';
+      
+      // Simple heuristic: if lines are different, mark as changed
+      if (leftLine !== rightLine) {
+        if (leftLine === '') {
+          lineType = 'added';
+        } else if (rightLine === '') {
+          lineType = 'removed';
+        } else {
+          lineType = 'changed';
+        }
+      }
+      
+      this.createDiffLine(i + 1, leftLine, i + 1, rightLine, lineType);
     }
-    
-    return badge;
   }
-
-  createValueDisplay(diff) {
-    const container = document.createElement('div');
+  
+  createDiffLine(leftLineNum, leftContent, rightLineNum, rightContent, type) {
+    const diffLine = document.createElement('div');
+    diffLine.className = `diff-line ${type}`;
     
-    switch (diff.type) {
-      case 'value_change':
-        container.appendChild(this.createValueRow('Left', this.formatValue(diff.left), 'changed-left'));
-        container.appendChild(this.createValueRow('Right', this.formatValue(diff.right), 'changed-right'));
-        break;
-      case 'type_change':
-        container.appendChild(this.createValueRow('Left', `${diff.left.type} (${this.formatValue(diff.left.value)})`, 'type-left'));
-        container.appendChild(this.createValueRow('Right', `${diff.right.type} (${this.formatValue(diff.right.value)})`, 'type-right'));
-        break;
-      case 'added':
-        container.appendChild(this.createValueRow('Value', this.formatValue(diff.right), 'added'));
-        break;
-      case 'removed':
-        container.appendChild(this.createValueRow('Value', this.formatValue(diff.left), 'removed'));
-        break;
-    }
+    // Left line number
+    const leftNum = document.createElement('div');
+    leftNum.className = 'line-number';
+    leftNum.textContent = type === 'added' ? '' : leftLineNum;
     
-    return container;
-  }
-
-  createValueRow(label, value, className) {
-    const row = document.createElement('div');
-    row.className = `value-row ${className}`;
-
-    const labelEl = document.createElement('span');
-    labelEl.className = 'value-label';
-    labelEl.textContent = label + ':';
-
-    const contentEl = document.createElement('span');
-    contentEl.className = 'value-content';
-    contentEl.textContent = value;
-
-    row.appendChild(labelEl);
-    row.appendChild(contentEl);
-
-    return row;
+    // Left content
+    const leftDiv = document.createElement('div');
+    leftDiv.className = 'line-content';
+    leftDiv.textContent = type === 'added' ? '' : leftContent;
+    
+    // Right line number
+    const rightNum = document.createElement('div');
+    rightNum.className = 'line-number';
+    rightNum.textContent = type === 'removed' ? '' : rightLineNum;
+    
+    // Right content
+    const rightDiv = document.createElement('div');
+    rightDiv.className = 'line-content';
+    rightDiv.textContent = type === 'removed' ? '' : rightContent;
+    
+    diffLine.appendChild(leftNum);
+    diffLine.appendChild(leftDiv);
+    diffLine.appendChild(rightNum);
+    diffLine.appendChild(rightDiv);
+    
+    this.diffContent.appendChild(diffLine);
   }
 
   formatValue(value) {
@@ -410,7 +390,7 @@ class JsonCompareUI {
   hideResults() {
     this.summary.classList.add('hidden');
     this.results.classList.add('hidden');
-    this.diffList.innerHTML = '';
+    this.diffContent.innerHTML = '';
   }
 
   // Load example data for demo

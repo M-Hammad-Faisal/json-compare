@@ -1,9 +1,20 @@
 # JSON Compare
 
-A powerful command-line tool to compare two JSON files and highlight the differences between them.
+A powerful tool to compare two JSON files and highlight the differences between them. Available both as a command-line tool and a beautiful web interface.
+
+🌐 **[Try the Web Interface](https://m-hammad-faisal.github.io/json-compare/)** - No installation required!
 
 ## Features
 
+### 🖥️ **Web Interface**
+- 🎨 **Git-like diff visualization** with side-by-side comparison
+- 📁 **File upload support** or paste JSON directly
+- 🔄 **Swap functionality** to quickly switch left/right
+- 📊 **Real-time comparison** with color-coded differences
+- 📱 **Responsive design** - works on desktop, tablet, and mobile
+- 🔒 **Privacy-first** - everything runs in your browser, no uploads
+
+### ⌨️ **Command Line**
 - 🔍 **Deep comparison**: Recursively compares nested objects and arrays
 - 📊 **Clear output**: Shows exactly what changed, was added, or was removed
 - 🎯 **Path tracking**: Displays the exact path where differences occur
@@ -26,7 +37,25 @@ chmod +x src/json-compare.js
 
 ## Usage
 
-### Basic usage
+### 🌐 Web Interface
+
+**[Launch Web App](https://m-hammad-faisal.github.io/json-compare/)**
+
+Or run locally:
+```bash
+npm run web:open  # Opens web interface in your browser
+```
+
+The web interface provides:
+- Side-by-side JSON comparison with syntax highlighting
+- Git-style diff colors (🟢 added, 🔴 removed, 🟡 changed)
+- File upload or direct JSON paste
+- Mobile-responsive design
+- No server required - runs entirely in your browser
+
+### ⌨️ Command Line
+
+#### Basic usage
 ```bash
 node src/json-compare.js file1.json file2.json
 ```
@@ -152,13 +181,33 @@ npm test
 4. Add tests for new functionality
 5. Submit a pull request
 
+## Deployment
+
+### GitHub Pages
+
+This project is automatically deployed to GitHub Pages at:
+**https://m-hammad-faisal.github.io/json-compare/**
+
+To deploy your own copy:
+1. Fork this repository
+2. Enable GitHub Pages in repository settings
+3. Set source to "Deploy from a branch" → `main` → `/web`
+4. Your JSON Compare tool will be available at `https://yourusername.github.io/json-compare/`
+
 ## Requirements
 
-- Node.js 12.0.0 or higher
+- **Web Interface**: Modern browser with JavaScript enabled
+- **Command Line**: Node.js 12.0.0 or higher
 
 ## License
 
 MIT License - see LICENSE file for details
+
+---
+
+<p align="center">
+  Made with ❤️ by <a href="https://github.com/M-Hammad-Faisal">M-Hammad-Faisal</a>
+</p>
 
 ## Roadmap
 
