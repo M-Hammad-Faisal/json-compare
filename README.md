@@ -19,7 +19,7 @@ JSON Compare is a powerful, browser-based tool for comparing JSON files with pre
 
 <div align="center">
 
-![JSON Compare Interface](assets/Screenshot.png)
+![JSON Compare Interface](assets/images/Screenshot.png)
 
 *Professional side-by-side JSON comparison with GitHub-style diff visualization*
 
