@@ -1,21 +1,9 @@
-/**
- * Web UI for JSON Compare Tool
- * Adapts the JsonCompare class for browser use with Git-like diff display
- */
-
 class JsonCompare {
   constructor() {
     this.differences = [];
   }
 
-  /**
-   * Compare two JSON objects recursively
-   * @param {*} left - Left JSON object
-   * @param {*} right - Right JSON object  
-   * @param {string} path - Current path in the object
-   */
   compare(left, right, path = '') {
-    // Handle null/undefined cases
     if (left === null || left === undefined || right === null || right === undefined) {
       if (left !== right) {
         this.differences.push({
@@ -28,7 +16,6 @@ class JsonCompare {
       return;
     }
 
-    // Handle different types
     if (typeof left !== typeof right) {
       this.differences.push({
         path: path || 'root',
@@ -39,19 +26,16 @@ class JsonCompare {
       return;
     }
 
-    // Handle arrays
     if (Array.isArray(left) && Array.isArray(right)) {
       this.compareArrays(left, right, path);
       return;
     }
 
-    // Handle objects
     if (typeof left === 'object' && typeof right === 'object') {
       this.compareObjects(left, right, path);
       return;
     }
 
-    // Handle primitive values
     if (left !== right) {
       this.differences.push({
         path: path || 'root',
@@ -110,19 +94,13 @@ class JsonCompare {
     }
   }
 
-  /**
-   * Main comparison function
-   * @param {*} leftJson - Left JSON object
-   * @param {*} rightJson - Right JSON object
-   */
   compareObjects(leftJson, rightJson) {
-    this.differences = []; // Reset differences
+    this.differences = [];
     this.compare(leftJson, rightJson);
     return this.differences;
   }
 }
 
-// UI Controller
 class JsonCompareUI {
   constructor() {
     this.comparer = new JsonCompare();
@@ -143,7 +121,6 @@ class JsonCompareUI {
     this.results = document.getElementById('results');
     this.diffContent = document.getElementById('diffContent');
     
-    // Modal elements
     this.docsBtn = document.getElementById('docsBtn');
     this.docsFooterBtn = document.getElementById('docsFooterBtn');
     this.docsModal = document.getElementById('docsModal');
@@ -151,31 +128,22 @@ class JsonCompareUI {
   }
 
   attachEventListeners() {
-    // File inputs
     this.leftFile.addEventListener('change', (e) => this.handleFileLoad(e, 'left'));
     this.rightFile.addEventListener('change', (e) => this.handleFileLoad(e, 'right'));
-
-    // Buttons
     this.compareBtn.addEventListener('click', () => this.performComparison());
     this.swapBtn.addEventListener('click', () => this.swapInputs());
-
-    // Auto-format JSON on paste/input
     this.leftText.addEventListener('blur', () => this.formatJSON(this.leftText));
     this.rightText.addEventListener('blur', () => this.formatJSON(this.rightText));
-    
-    // Modal event listeners
     this.docsBtn.addEventListener('click', () => this.openDocsModal());
     this.docsFooterBtn.addEventListener('click', () => this.openDocsModal());
     this.closeDocsBtn.addEventListener('click', () => this.closeDocsModal());
     
-    // Close modal when clicking outside
     this.docsModal.addEventListener('click', (e) => {
       if (e.target === this.docsModal) {
         this.closeDocsModal();
       }
     });
     
-    // Close modal with Escape key
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && !this.docsModal.classList.contains('hidden')) {
         this.closeDocsModal();

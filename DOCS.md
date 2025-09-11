@@ -1,202 +1,208 @@
-# JSON Compare
+# JSON Compare Documentation
 
-A powerful tool to compare two JSON files and highlight the differences between them.
+> Comprehensive guide for the JSON Compare tool
 
-## 🌐 Web Interface
+## Table of Contents
 
-**[🚀 Launch App](index.html)** | **[📖 Documentation](DOCS.md)**
+- [Web Interface Guide](#web-interface-guide)
+- [Command Line Interface](#command-line-interface)
+- [API Reference](#api-reference)
+- [Diff Algorithm](#diff-algorithm)
+- [Contributing](#contributing)
+- [Troubleshooting](#troubleshooting)
 
-A beautiful web interface with Git-style side-by-side diff visualization - no installation required!
+## Web Interface Guide
 
-## Features
+### Getting Started
 
-### 🖥️ **Web Interface**
-- 🎨 **Git-like diff visualization** with side-by-side comparison
-- 📁 **File upload support** or paste JSON directly
-- 🔄 **Swap functionality** to quickly switch left/right
-- 📊 **Real-time comparison** with color-coded differences
-- 📱 **Responsive design** - works on desktop, tablet, and mobile
-- 🔒 **Privacy-first** - everything runs in your browser, no uploads
+The web interface provides an intuitive way to compare JSON files without any installation. Access it at [m-hammad-faisal.github.io/json-compare](https://m-hammad-faisal.github.io/json-compare/).
 
-### ⌨️ **Command Line**
-- 🔍 **Deep comparison**: Recursively compares nested objects and arrays
-- 📊 **Clear output**: Shows exactly what changed, was added, or was removed
-- 🎯 **Path tracking**: Displays the exact path where differences occur
-- 🚀 **Fast and lightweight**: No external dependencies
-- 💻 **Cross-platform**: Works on Windows, macOS, and Linux
+### Interface Overview
 
-## Installation
+**Input Methods**
+- **File Upload**: Click "Choose File" to upload JSON files
+- **Direct Input**: Paste or type JSON directly into text areas
+- **Drag & Drop**: Drop JSON files onto the input areas
 
-### Clone and run locally
+**Comparison Controls**
+- **Compare Button**: Initiates the diff analysis
+- **Swap Button**: Exchanges left and right inputs
+- **Clear Button**: Resets both input areas
+
+**Diff Visualization**
+- **Side-by-Side View**: GitHub-style comparison layout
+- **Line Numbers**: Corresponding line references
+- **Color Coding**: 
+  - 🟢 **Green**: Added lines
+  - 🔴 **Red**: Removed lines  
+  - 🟡 **Yellow**: Modified lines
+  - ⚪ **Gray**: Unchanged lines
+
+### Best Practices
+
+1. **Format JSON**: Use pretty-printed JSON for better readability
+2. **Large Files**: Browser may slow with files >10MB
+3. **Privacy**: All processing happens locally - no data uploaded
+4. **Mobile Use**: Interface adapts to smaller screens
+
+## Command Line Interface
+
+### Installation
+
 ```bash
-git clone <your-repo-url>
+# Clone repository
+git clone https://github.com/M-Hammad-Faisal/json-compare.git
 cd json-compare
 npm install
+
+# Optional: Install globally
+npm link
 ```
 
-### Make executable (optional)
-```bash
-chmod +x src/json-compare.js
-```
+### Usage
 
-## Usage
-
-### 🌐 Web Interface
-
-**[Launch Web App](https://m-hammad-faisal.github.io/json-compare/)**
-
-Or run locally:
-```bash
-npm run web:open  # Opens web interface in your browser
-```
-
-The web interface provides:
-- Side-by-side JSON comparison with syntax highlighting
-- Git-style diff colors (🟢 added, 🔴 removed, 🟡 changed)
-- File upload or direct JSON paste
-- Mobile-responsive design
-- No server required - runs entirely in your browser
-
-### ⌨️ Command Line
-
-#### Basic usage
+**Basic Comparison**
 ```bash
 node src/json-compare.js file1.json file2.json
 ```
 
-### Using npm scripts
+**Using NPM Scripts**
 ```bash
-npm start file1.json file2.json
-npm run example  # Run with example files
-```
+# Compare specific files
+npm start path/to/file1.json path/to/file2.json
 
-### As a global command (after npm link)
-```bash
-npm link
-json-compare file1.json file2.json
-```
-
-## Examples
-
-### Example files
-Create some test files to try out the tool:
-
-**examples/left.json:**
-```json
-{
-  "name": "John Doe",
-  "age": 30,
-  "city": "New York",
-  "hobbies": ["reading", "swimming"],
-  "address": {
-    "street": "123 Main St",
-    "zip": "10001"
-  }
-}
-```
-
-**examples/right.json:**
-```json
-{
-  "name": "John Doe",
-  "age": 31,
-  "city": "San Francisco",
-  "hobbies": ["reading", "cycling", "photography"],
-  "address": {
-    "street": "456 Oak Ave",
-    "zip": "10001",
-    "country": "USA"
-  }
-}
-```
-
-### Running the comparison
-```bash
+# Run with example files
 npm run example
 ```
 
-### Sample output
+**Global Command (after npm link)**
+```bash
+json-compare file1.json file2.json
 ```
-🔍 Found 4 difference(s):
 
-1. Path: age
-   Type: Value changed
+### Output Format
+
+The CLI provides detailed comparison results:
+
+```
+🔍 Comparison Results: 4 difference(s) found
+
+ℹ️ Path: user.age
+   Type: Value Changed
    Left:  30
    Right: 31
 
-2. Path: city
-   Type: Value changed
-   Left:  "New York"
-   Right: "San Francisco"
-
-3. Path: hobbies[1]
-   Type: Value changed
-   Left:  "swimming"
-   Right: "cycling"
-
-4. Path: hobbies[2]
-   Type: Added in right
-   Value: "photography"
-
-5. Path: address.street
-   Type: Value changed
-   Left:  "123 Main St"
-   Right: "456 Oak Ave"
-
-6. Path: address.country
-   Type: Added in right
+➕ Path: user.address.country
+   Type: Added
    Value: "USA"
+
+➖ Path: user.phone
+   Type: Removed
+   Value: "+1234567890"
 ```
 
-## Difference Types
+## API Reference
 
-The tool detects several types of differences:
+### JsonCompare Class
 
-- **Value changed**: A property exists in both files but has different values
-- **Type changed**: A property exists in both files but has different data types
-- **Added in right**: A property exists only in the right file
-- **Removed from right**: A property exists only in the left file
-
-## Project Structure
-
-```
-json-compare/
-├── src/
-│   └── json-compare.js    # Main application
-├── tests/                 # Test files (to be added)
-├── examples/             # Example JSON files
-├── docs/                 # Documentation
-├── package.json          # Node.js configuration
-└── README.md            # This file
+```javascript
+const comparer = new JsonCompare();
+const differences = comparer.compareObjects(leftJson, rightJson);
 ```
 
-## Development
+**Methods**
 
-### Adding tests
-Tests will be added in the `tests/` directory. Run them with:
+- `compareObjects(left, right)` - Main comparison method
+- `compare(left, right, path)` - Recursive comparison with path tracking
+- `compareArrays(left, right, path)` - Array-specific comparison
+- `formatDifferences()` - Human-readable output formatting
+
+**Difference Types**
+
+| Type | Description | Example |
+|------|-------------|---------|
+| `value_change` | Property exists in both, different values | `"John"` → `"Jane"` |
+| `type_change` | Property exists in both, different types | `30` → `"30"` |
+| `added` | Property only in right file | `null` → `"new_value"` |
+| `removed` | Property only in left file | `"old_value"` → `null` |
+
+## Diff Algorithm
+
+### LCS Implementation
+
+The web interface uses a **Longest Common Subsequence (LCS)** algorithm for line-by-line comparison:
+
+1. **Line Normalization**: Removes trailing commas and whitespace
+2. **JSON-Aware Matching**: Recognizes property names for better alignment
+3. **Change Classification**: Determines if lines are added, removed, or modified
+4. **Visual Rendering**: Maps changes to color-coded diff display
+
+### Performance Characteristics
+
+- **Time Complexity**: O(m × n) where m, n are line counts
+- **Space Complexity**: O(m × n) for the dynamic programming table
+- **Optimal for**: JSON files with similar structure
+- **Limitations**: Large files (>10,000 lines) may impact browser performance
+
+## Contributing
+
+### Development Setup
+
 ```bash
-npm test
+git clone https://github.com/M-Hammad-Faisal/json-compare.git
+cd json-compare
+npm install
+npm run example  # Test the tool
 ```
 
-### Contributing
+### Code Style
+
+- **ES6+ JavaScript**: Modern syntax preferred
+- **No External Dependencies**: Keep it lightweight
+- **Clear Naming**: Descriptive variable and function names
+- **Documentation**: Comment complex algorithms
+
+### Pull Request Process
+
 1. Fork the repository
-2. Create a feature branch
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Make your changes
-4. Add tests for new functionality
-5. Submit a pull request
+4. Test thoroughly
+5. Submit a pull request with clear description
 
-## Deployment
+## Troubleshooting
 
-### GitHub Pages
+### Common Issues
 
-This project is automatically deployed to GitHub Pages at:
-**https://m-hammad-faisal.github.io/json-compare/**
+**"Invalid JSON" Error**
+- Ensure JSON is properly formatted
+- Check for trailing commas, missing quotes
+- Use a JSON validator online
 
-To deploy your own copy:
-1. Fork this repository
-2. Enable GitHub Pages in repository settings
-3. Set source to "Deploy from a branch" → `main` → `/web`
-4. Your JSON Compare tool will be available at `https://yourusername.github.io/json-compare/`
+**Performance Issues**
+- Large files may cause browser slowdown
+- Consider breaking large JSON into smaller chunks
+- Use CLI for very large files
+
+**Diff Not Showing**
+- Verify both inputs have content
+- Check browser console for JavaScript errors
+- Try refreshing the page
+
+### Browser Compatibility
+
+| Browser | Version | Support |
+|---------|---------|----------|
+| Chrome  | 60+     | ✅ Full |
+| Firefox | 55+     | ✅ Full |
+| Safari  | 12+     | ✅ Full |
+| Edge    | 79+     | ✅ Full |
+
+### Getting Help
+
+- **Issues**: [GitHub Issues](https://github.com/M-Hammad-Faisal/json-compare/issues)
+- **Documentation**: This guide
+- **Examples**: Check the `/examples` directory
 
 ## Requirements
 
