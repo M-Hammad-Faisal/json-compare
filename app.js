@@ -320,12 +320,12 @@ class JsonCompareUI {
     const leftLines = leftText.split('\n');
     const rightLines = rightText.split('\n');
     
-    // Create a unified diff by aligning changes properly
-    const diffLines = this.createUnifiedDiff(leftLines, rightLines, differences);
+    // Use a simple but effective LCS-based diff algorithm
+    const diffResult = this.createLineDiff(leftLines, rightLines);
     
     this.diffContent.innerHTML = '';
     
-    diffLines.forEach(line => {
+    diffResult.forEach(line => {
       this.createDiffLine(
         line.leftLineNum,
         line.leftContent,
@@ -336,141 +336,130 @@ class JsonCompareUI {
     });
   }
   
-  createUnifiedDiff(leftLines, rightLines, differences) {
-    // Create path-to-line mappings for both sides
-    const leftPathLines = this.createPathToLineMap(leftLines);
-    const rightPathLines = this.createPathToLineMap(rightLines);
-    
-    // Create a map of changed paths
-    const changedPaths = new Map();
-    differences.forEach(diff => {
-      changedPaths.set(diff.path, diff.type);
-    });
-    
+  createLineDiff(leftLines, rightLines) {
+    // Simple line-by-line diff using longest common subsequence approach
+    const lcs = this.computeLCS(leftLines, rightLines);
     const result = [];
-    const maxLines = Math.max(leftLines.length, rightLines.length);
     
-    let leftIndex = 0;
-    let rightIndex = 0;
+    let leftIdx = 0;
+    let rightIdx = 0;
+    let lcsIdx = 0;
     
-    while (leftIndex < leftLines.length || rightIndex < rightLines.length) {
-      const leftLine = leftLines[leftIndex] || '';
-      const rightLine = rightLines[rightIndex] || '';
-      
-      // Check if this line contains a changed path
-      const leftPath = this.extractPathFromLine(leftLine, leftIndex, leftLines);
-      const rightPath = this.extractPathFromLine(rightLine, rightIndex, rightLines);
-      
-      let lineType = 'unchanged';
-      let leftNum = leftIndex < leftLines.length ? leftIndex + 1 : null;
-      let rightNum = rightIndex < rightLines.length ? rightIndex + 1 : null;
-      
-      // Check if either path is in our differences
-      if (leftPath && changedPaths.has(leftPath)) {
-        const diffType = changedPaths.get(leftPath);
-        lineType = this.mapDiffTypeToLineType(diffType);
-      } else if (rightPath && changedPaths.has(rightPath)) {
-        const diffType = changedPaths.get(rightPath);
-        lineType = this.mapDiffTypeToLineType(diffType);
-      }
-      
-      // Handle line alignment based on content similarity
-      if (leftIndex >= leftLines.length) {
-        // Only right lines remaining
+    while (leftIdx < leftLines.length || rightIdx < rightLines.length) {
+      if (lcsIdx < lcs.length && 
+          leftIdx < leftLines.length && 
+          rightIdx < rightLines.length && 
+          leftLines[leftIdx] === lcs[lcsIdx] && 
+          rightLines[rightIdx] === lcs[lcsIdx]) {
+        // Common line
+        result.push({
+          leftLineNum: leftIdx + 1,
+          leftContent: leftLines[leftIdx],
+          rightLineNum: rightIdx + 1,
+          rightContent: rightLines[rightIdx],
+          type: 'unchanged'
+        });
+        leftIdx++;
+        rightIdx++;
+        lcsIdx++;
+      } else if (lcsIdx < lcs.length && 
+                 leftIdx < leftLines.length && 
+                 leftLines[leftIdx] === lcs[lcsIdx]) {
+        // Right side has additions
         result.push({
           leftLineNum: null,
           leftContent: '',
-          rightLineNum: rightNum,
-          rightContent: rightLine,
+          rightLineNum: rightIdx + 1,
+          rightContent: rightLines[rightIdx],
           type: 'added'
         });
-        rightIndex++;
-      } else if (rightIndex >= rightLines.length) {
-        // Only left lines remaining
+        rightIdx++;
+      } else if (lcsIdx < lcs.length && 
+                 rightIdx < rightLines.length && 
+                 rightLines[rightIdx] === lcs[lcsIdx]) {
+        // Left side has deletions
         result.push({
-          leftLineNum: leftNum,
-          leftContent: leftLine,
+          leftLineNum: leftIdx + 1,
+          leftContent: leftLines[leftIdx],
           rightLineNum: null,
           rightContent: '',
           type: 'removed'
         });
-        leftIndex++;
-      } else if (leftLine.trim() === rightLine.trim()) {
-        // Lines are identical
-        result.push({
-          leftLineNum: leftNum,
-          leftContent: leftLine,
-          rightLineNum: rightNum,
-          rightContent: rightLine,
-          type: 'unchanged'
-        });
-        leftIndex++;
-        rightIndex++;
+        leftIdx++;
       } else {
-        // Lines are different
-        result.push({
-          leftLineNum: leftNum,
-          leftContent: leftLine,
-          rightLineNum: rightNum,
-          rightContent: rightLine,
-          type: lineType === 'unchanged' ? 'changed' : lineType
-        });
-        leftIndex++;
-        rightIndex++;
+        // Handle remaining lines
+        if (leftIdx < leftLines.length && rightIdx < rightLines.length) {
+          // Both sides have content - this is a change
+          result.push({
+            leftLineNum: leftIdx + 1,
+            leftContent: leftLines[leftIdx],
+            rightLineNum: rightIdx + 1,
+            rightContent: rightLines[rightIdx],
+            type: 'changed'
+          });
+          leftIdx++;
+          rightIdx++;
+        } else if (leftIdx < leftLines.length) {
+          // Only left side has content - removal
+          result.push({
+            leftLineNum: leftIdx + 1,
+            leftContent: leftLines[leftIdx],
+            rightLineNum: null,
+            rightContent: '',
+            type: 'removed'
+          });
+          leftIdx++;
+        } else if (rightIdx < rightLines.length) {
+          // Only right side has content - addition
+          result.push({
+            leftLineNum: null,
+            leftContent: '',
+            rightLineNum: rightIdx + 1,
+            rightContent: rightLines[rightIdx],
+            type: 'added'
+          });
+          rightIdx++;
+        }
       }
     }
     
     return result;
   }
   
-  createPathToLineMap(lines) {
-    const pathLines = new Map();
-    const pathStack = [];
+  computeLCS(leftLines, rightLines) {
+    // Compute Longest Common Subsequence using dynamic programming
+    const m = leftLines.length;
+    const n = rightLines.length;
+    const dp = Array(m + 1).fill().map(() => Array(n + 1).fill(0));
     
-    lines.forEach((line, index) => {
-      const trimmed = line.trim();
-      
-      // Track object/array nesting to build paths
-      if (trimmed.includes('":')) {
-        const keyMatch = trimmed.match(/"([^"]+)"\s*:/);
-        if (keyMatch) {
-          const key = keyMatch[1];
-          const currentPath = pathStack.length > 0 ? pathStack.join('.') + '.' + key : key;
-          pathLines.set(currentPath, index);
+    // Build the LCS table
+    for (let i = 1; i <= m; i++) {
+      for (let j = 1; j <= n; j++) {
+        if (leftLines[i - 1].trim() === rightLines[j - 1].trim()) {
+          dp[i][j] = dp[i - 1][j - 1] + 1;
+        } else {
+          dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
         }
       }
-      
-      // Handle array elements
-      if (trimmed === '{' || trimmed === '[') {
-        // Opening brace/bracket
-      } else if (trimmed === '}' || trimmed === ']') {
-        // Closing brace/bracket
-        if (pathStack.length > 0) pathStack.pop();
-      }
-    });
+    }
     
-    return pathLines;
-  }
-  
-  extractPathFromLine(line, lineIndex, allLines) {
-    const trimmed = line.trim();
-    if (trimmed.includes('":')) {
-      const keyMatch = trimmed.match(/"([^"]+)"\s*:/);
-      if (keyMatch) {
-        return keyMatch[1]; // Simplified path extraction
+    // Reconstruct the LCS
+    const lcs = [];
+    let i = m, j = n;
+    
+    while (i > 0 && j > 0) {
+      if (leftLines[i - 1].trim() === rightLines[j - 1].trim()) {
+        lcs.unshift(leftLines[i - 1]);
+        i--;
+        j--;
+      } else if (dp[i - 1][j] > dp[i][j - 1]) {
+        i--;
+      } else {
+        j--;
       }
     }
-    return null;
-  }
-  
-  mapDiffTypeToLineType(diffType) {
-    switch (diffType) {
-      case 'added': return 'added';
-      case 'removed': return 'removed';
-      case 'value_change': return 'changed';
-      case 'type_change': return 'changed';
-      default: return 'unchanged';
-    }
+    
+    return lcs;
   }
   
   createDiffLine(leftLineNum, leftContent, rightLineNum, rightContent, type) {
