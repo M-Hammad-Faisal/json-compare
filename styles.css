@@ -357,18 +357,22 @@ button {
 
 .badge.changed {
   background: #fd7e14;
+  color: white;
 }
 
 .badge.added {
   background: #28a745;
+  color: white;
 }
 
 .badge.removed {
   background: #dc3545;
+  color: white;
 }
 
 .badge.type {
   background: #6f42c1;
+  color: white;
 }
 
 /* Diff display - Side by side view */
@@ -601,14 +605,15 @@ button {
   font-size: 24px;
   cursor: pointer;
   color: #6c757d;
-  padding: 0;
-  width: 30px;
-  height: 30px;
+  padding: 8px;
+  min-width: 44px;
+  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   transition: all 0.2s;
+  touch-action: manipulation;
 }
 
 .close-btn:hover {
@@ -670,22 +675,22 @@ button {
 
 .color-box.added {
   background: #e6ffed;
-  border-color: #cdffd8;
+  border-color: #28a745;
 }
 
 .color-box.removed {
   background: #ffeef0;
-  border-color: #ffdce0;
+  border-color: #dc3545;
 }
 
 .color-box.changed {
   background: #fff8c5;
-  border-color: #ffec9a;
+  border-color: #fd7e14;
 }
 
 .color-box.unchanged {
   background: #fff;
-  border-color: #e1e4e8;
+  border-color: #6c757d;
 }
 
 .docs-section pre {
@@ -814,6 +819,12 @@ button {
   
   .color-legend {
     grid-template-columns: 1fr;
+  }
+  
+  .close-btn {
+    min-width: 48px;
+    min-height: 48px;
+    font-size: 20px;
   }
 }
 

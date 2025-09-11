@@ -320,35 +320,156 @@ class JsonCompareUI {
     const leftLines = leftText.split('\n');
     const rightLines = rightText.split('\n');
     
-    // Create a map of changed paths for quick lookup
+    // Create a unified diff by aligning changes properly
+    const diffLines = this.createUnifiedDiff(leftLines, rightLines, differences);
+    
+    this.diffContent.innerHTML = '';
+    
+    diffLines.forEach(line => {
+      this.createDiffLine(
+        line.leftLineNum,
+        line.leftContent,
+        line.rightLineNum,
+        line.rightContent,
+        line.type
+      );
+    });
+  }
+  
+  createUnifiedDiff(leftLines, rightLines, differences) {
+    // Create path-to-line mappings for both sides
+    const leftPathLines = this.createPathToLineMap(leftLines);
+    const rightPathLines = this.createPathToLineMap(rightLines);
+    
+    // Create a map of changed paths
     const changedPaths = new Map();
     differences.forEach(diff => {
       changedPaths.set(diff.path, diff.type);
     });
     
-    this.diffContent.innerHTML = '';
-    
+    const result = [];
     const maxLines = Math.max(leftLines.length, rightLines.length);
     
-    for (let i = 0; i < maxLines; i++) {
-      const leftLine = leftLines[i] || '';
-      const rightLine = rightLines[i] || '';
+    let leftIndex = 0;
+    let rightIndex = 0;
+    
+    while (leftIndex < leftLines.length || rightIndex < rightLines.length) {
+      const leftLine = leftLines[leftIndex] || '';
+      const rightLine = rightLines[rightIndex] || '';
       
-      // Determine line type
+      // Check if this line contains a changed path
+      const leftPath = this.extractPathFromLine(leftLine, leftIndex, leftLines);
+      const rightPath = this.extractPathFromLine(rightLine, rightIndex, rightLines);
+      
       let lineType = 'unchanged';
+      let leftNum = leftIndex < leftLines.length ? leftIndex + 1 : null;
+      let rightNum = rightIndex < rightLines.length ? rightIndex + 1 : null;
       
-      // Simple heuristic: if lines are different, mark as changed
-      if (leftLine !== rightLine) {
-        if (leftLine === '') {
-          lineType = 'added';
-        } else if (rightLine === '') {
-          lineType = 'removed';
-        } else {
-          lineType = 'changed';
+      // Check if either path is in our differences
+      if (leftPath && changedPaths.has(leftPath)) {
+        const diffType = changedPaths.get(leftPath);
+        lineType = this.mapDiffTypeToLineType(diffType);
+      } else if (rightPath && changedPaths.has(rightPath)) {
+        const diffType = changedPaths.get(rightPath);
+        lineType = this.mapDiffTypeToLineType(diffType);
+      }
+      
+      // Handle line alignment based on content similarity
+      if (leftIndex >= leftLines.length) {
+        // Only right lines remaining
+        result.push({
+          leftLineNum: null,
+          leftContent: '',
+          rightLineNum: rightNum,
+          rightContent: rightLine,
+          type: 'added'
+        });
+        rightIndex++;
+      } else if (rightIndex >= rightLines.length) {
+        // Only left lines remaining
+        result.push({
+          leftLineNum: leftNum,
+          leftContent: leftLine,
+          rightLineNum: null,
+          rightContent: '',
+          type: 'removed'
+        });
+        leftIndex++;
+      } else if (leftLine.trim() === rightLine.trim()) {
+        // Lines are identical
+        result.push({
+          leftLineNum: leftNum,
+          leftContent: leftLine,
+          rightLineNum: rightNum,
+          rightContent: rightLine,
+          type: 'unchanged'
+        });
+        leftIndex++;
+        rightIndex++;
+      } else {
+        // Lines are different
+        result.push({
+          leftLineNum: leftNum,
+          leftContent: leftLine,
+          rightLineNum: rightNum,
+          rightContent: rightLine,
+          type: lineType === 'unchanged' ? 'changed' : lineType
+        });
+        leftIndex++;
+        rightIndex++;
+      }
+    }
+    
+    return result;
+  }
+  
+  createPathToLineMap(lines) {
+    const pathLines = new Map();
+    const pathStack = [];
+    
+    lines.forEach((line, index) => {
+      const trimmed = line.trim();
+      
+      // Track object/array nesting to build paths
+      if (trimmed.includes('":')) {
+        const keyMatch = trimmed.match(/"([^"]+)"\s*:/);
+        if (keyMatch) {
+          const key = keyMatch[1];
+          const currentPath = pathStack.length > 0 ? pathStack.join('.') + '.' + key : key;
+          pathLines.set(currentPath, index);
         }
       }
       
-      this.createDiffLine(i + 1, leftLine, i + 1, rightLine, lineType);
+      // Handle array elements
+      if (trimmed === '{' || trimmed === '[') {
+        // Opening brace/bracket
+      } else if (trimmed === '}' || trimmed === ']') {
+        // Closing brace/bracket
+        if (pathStack.length > 0) pathStack.pop();
+      }
+    });
+    
+    return pathLines;
+  }
+  
+  extractPathFromLine(line, lineIndex, allLines) {
+    const trimmed = line.trim();
+    if (trimmed.includes('":')) {
+      const keyMatch = trimmed.match(/"([^"]+)"\s*:/);
+      if (keyMatch) {
+        return keyMatch[1]; // Simplified path extraction
+      }
+    }
+    return null;
+  }
+  
+  mapDiffTypeToLineType(diffType) {
+    switch (diffType) {
+      case 'added': return 'added';
+      case 'removed': return 'removed';
+      case 'value_change': return 'changed';
+      case 'type_change': return 'changed';
+      default: return 'unchanged';
     }
   }
   
@@ -359,22 +480,22 @@ class JsonCompareUI {
     // Left line number
     const leftNum = document.createElement('div');
     leftNum.className = 'line-number';
-    leftNum.textContent = type === 'added' ? '' : leftLineNum;
+    leftNum.textContent = (type === 'added' || leftLineNum === null) ? '' : leftLineNum;
     
     // Left content
     const leftDiv = document.createElement('div');
     leftDiv.className = 'line-content';
-    leftDiv.textContent = type === 'added' ? '' : leftContent;
+    leftDiv.textContent = (type === 'added' || leftContent === null) ? '' : leftContent;
     
     // Right line number
     const rightNum = document.createElement('div');
     rightNum.className = 'line-number';
-    rightNum.textContent = type === 'removed' ? '' : rightLineNum;
+    rightNum.textContent = (type === 'removed' || rightLineNum === null) ? '' : rightLineNum;
     
     // Right content
     const rightDiv = document.createElement('div');
     rightDiv.className = 'line-content';
-    rightDiv.textContent = type === 'removed' ? '' : rightContent;
+    rightDiv.textContent = (type === 'removed' || rightContent === null) ? '' : rightContent;
     
     diffLine.appendChild(leftNum);
     diffLine.appendChild(leftDiv);
