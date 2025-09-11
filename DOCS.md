@@ -216,12 +216,6 @@ npm run example  # Test the tool
 
 MIT License - see LICENSE file for details
 
----
-
-<p align="center">
-  Made with ❤️ by <a href="https://github.com/M-Hammad-Faisal">M-Hammad-Faisal</a>
-</p>
-
 ## Roadmap
 
 - [ ] Add comprehensive test suite
@@ -231,3 +225,11 @@ MIT License - see LICENSE file for details
 - [ ] Configuration file support
 - [ ] Performance optimizations for large files
 - [ ] Color-coded terminal output
+
+---
+
+<div align="center">
+
+Made with ❤️ by **[M-Hammad-Faisal](https://github.com/M-Hammad-Faisal)**
+
+</div>

@@ -67,16 +67,6 @@ npm install
 npm start examples/left.json examples/right.json
 ```
 
----
-
-<div align="center">
-
-Made with ❤️ by **[M-Hammad-Faisal](https://github.com/M-Hammad-Faisal)**
-
-⭐ **Star this repo if you find it useful!**
-
-</div>
-
 ## Development
 
 ### Local Development Setup
@@ -135,3 +125,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Customization**: Ignore patterns and custom rules  
 - **Themes**: Dark mode and color customization
 - **Advanced Features**: JSON schema validation and type checking
+
+---
+
+<div align="center">
+
+Made with ❤️ by **[M-Hammad-Faisal](https://github.com/M-Hammad-Faisal)**
+
+⭐ **Star this repo if you find it useful!**
+
+</div>
