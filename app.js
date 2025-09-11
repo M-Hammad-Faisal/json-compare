@@ -121,10 +121,13 @@ class JsonCompareUI {
     this.results = document.getElementById('results');
     this.diffContent = document.getElementById('diffContent');
     
+    this.themeToggle = document.getElementById('themeToggle');
     this.docsBtn = document.getElementById('docsBtn');
     this.docsFooterBtn = document.getElementById('docsFooterBtn');
     this.docsModal = document.getElementById('docsModal');
     this.closeDocsBtn = document.getElementById('closeDocsBtn');
+    
+    this.initializeTheme();
   }
 
   attachEventListeners() {
@@ -134,6 +137,7 @@ class JsonCompareUI {
     this.swapBtn.addEventListener('click', () => this.swapInputs());
     this.leftText.addEventListener('blur', () => this.formatJSON(this.leftText));
     this.rightText.addEventListener('blur', () => this.formatJSON(this.rightText));
+    this.themeToggle.addEventListener('click', () => this.toggleTheme());
     this.docsBtn.addEventListener('click', () => this.openDocsModal());
     this.docsFooterBtn.addEventListener('click', () => this.openDocsModal());
     this.closeDocsBtn.addEventListener('click', () => this.closeDocsModal());
@@ -149,6 +153,22 @@ class JsonCompareUI {
         this.closeDocsModal();
       }
     });
+  }
+
+  initializeTheme() {
+    const savedTheme = localStorage.getItem('json-compare-theme');
+    if (savedTheme) {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  }
+
+  toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('json-compare-theme', newTheme);
   }
 
   async handleFileLoad(event, side) {
