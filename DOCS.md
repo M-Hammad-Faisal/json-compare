@@ -36,11 +36,12 @@ The web interface provides an intuitive way to compare JSON files without any in
 **Diff Visualization**
 - **Side-by-Side View**: GitHub-style comparison layout
 - **Line Numbers**: Corresponding line references
-- **Color Coding**: 
-  - 🟢 **Green**: Added lines
-  - 🔴 **Red**: Removed lines  
-  - 🟡 **Yellow**: Modified lines
-  - ⚪ **Gray**: Unchanged lines
+- **Intelligent Color Coding**: 
+  - 🟢 **Green**: Added properties (only in right JSON)
+  - 🔴 **Red**: Removed properties (only in left JSON)
+  - 🟡 **Yellow**: Changed values (different content)
+  - 🟣 **Purple**: Type changes (same property, different data type)
+  - ⚪ **Gray**: Unchanged properties
 
 ### Theme Support
 
@@ -56,6 +57,23 @@ The web interface provides an intuitive way to compare JSON files without any in
 - **Smooth Transitions**: Animated theme changes for better UX
 - **Consistent Colors**: Diff colors maintain readability in both themes
 
+### Type Change Detection
+
+**Advanced Semantic Analysis**
+The tool intelligently detects when JSON properties change data types, highlighting these critical structural changes with distinct purple coloring.
+
+**Common Type Change Examples:**
+- `"hobbies": ["reading", "swimming"]` → `"hobbies": "swimming"` (Array to String)
+- `"age": 30` → `"age": "30"` (Number to String)  
+- `"isActive": true` → `"isActive": 1` (Boolean to Number)
+- `"config": {"key": "value"}` → `"config": "disabled"` (Object to String)
+
+**Why Type Changes Matter:**
+- **API Breaking Changes**: Identify when APIs change response formats
+- **Data Migration Issues**: Spot unintended type conversions
+- **Configuration Errors**: Detect structural config file changes
+- **Code Compatibility**: Ensure data contracts remain consistent
+
 ### Best Practices
 
 1. **Format JSON**: Use pretty-printed JSON for better readability
@@ -63,6 +81,7 @@ The web interface provides an intuitive way to compare JSON files without any in
 3. **Privacy**: All processing happens locally - no data uploaded
 4. **Mobile Use**: Interface adapts to smaller screens
 5. **Theme Choice**: Use dark theme for extended comparison sessions
+6. **Type Changes**: Pay special attention to purple-highlighted type changes
 
 ## Command Line Interface
 
@@ -104,12 +123,17 @@ json-compare file1.json file2.json
 The CLI provides detailed comparison results:
 
 ```
-🔍 Comparison Results: 4 difference(s) found
+🔍 Comparison Results: 5 difference(s) found
 
 ℹ️ Path: user.age
    Type: Value Changed
    Left:  30
    Right: 31
+
+🟣 Path: user.hobbies
+   Type: Type Changed
+   Left:  array ["reading", "swimming"]
+   Right: string "swimming"
 
 ➕ Path: user.address.country
    Type: Added
@@ -138,12 +162,12 @@ const differences = comparer.compareObjects(leftJson, rightJson);
 
 **Difference Types**
 
-| Type | Description | Example |
-|------|-------------|---------|
-| `value_change` | Property exists in both, different values | `"John"` → `"Jane"` |
-| `type_change` | Property exists in both, different types | `30` → `"30"` |
-| `added` | Property only in right file | `null` → `"new_value"` |
-| `removed` | Property only in left file | `"old_value"` → `null` |
+| Type | Description | Example | Visual Color |
+|------|-------------|---------|-------------|
+| `value_change` | Property exists in both, different values | `"John"` → `"Jane"` | 🟡 Yellow |
+| `type_change` | Property exists in both, different types | `30` → `"30"` | 🟣 Purple |
+| `added` | Property only in right file | `null` → `"new_value"` | 🟢 Green |
+| `removed` | Property only in left file | `"old_value"` → `null` | 🔴 Red |
 
 ## Diff Algorithm
 
@@ -212,6 +236,12 @@ npm run example  # Test the tool
 - Ensure JavaScript is enabled in your browser
 - Check if localStorage is available (required for theme persistence)
 - Try clearing browser cache and reload
+
+**Type Changes Not Highlighted**
+- Verify both JSONs are properly formatted and valid
+- Check that properties exist in both JSONs (type changes require same property names)
+- Ensure the data types are actually different (not just different values)
+- Try refreshing and re-comparing the JSONs
 
 ### Browser Compatibility
 

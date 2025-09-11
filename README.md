@@ -30,6 +30,7 @@ JSON Compare is a powerful, browser-based tool for comparing JSON files with pre
 ### Core Functionality
 - **GitHub-Style Visualization**: Professional side-by-side diff with syntax highlighting
 - **Smart JSON Parsing**: Understands JSON structure for accurate comparisons
+- **Type Change Detection**: Intelligent highlighting of data type changes (array → string, etc.)
 - **Multiple Input Methods**: File upload, drag & drop, or direct text input
 - **Intelligent Diff Algorithm**: LCS-based comparison with JSON-aware line matching
 
@@ -45,6 +46,13 @@ JSON Compare is a powerful, browser-based tool for comparing JSON files with pre
 - **High Performance**: Efficient algorithms handle large JSON files
 - **Cross-Platform**: Works in any modern browser
 - **Open Source**: MIT licensed with full source code available
+
+### Diff Types & Color Coding
+- **🟢 Added**: Properties that exist only in the right JSON
+- **🔴 Removed**: Properties that exist only in the left JSON  
+- **🟡 Changed**: Properties with different values in both JSONs
+- **🟣 Type Change**: Properties where the data type changed (e.g., array → string)
+- **⚪ Unchanged**: Identical properties in both JSONs
 
 ## Getting Started
 
