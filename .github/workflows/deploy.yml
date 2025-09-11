@@ -32,8 +32,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload web directory
-          path: './web'
+          # Upload root directory (contains web app files)
+          path: '.'
 
   # Deployment job
   deploy:

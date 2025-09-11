@@ -142,6 +142,12 @@ class JsonCompareUI {
     this.summary = document.getElementById('summary');
     this.results = document.getElementById('results');
     this.diffContent = document.getElementById('diffContent');
+    
+    // Modal elements
+    this.docsBtn = document.getElementById('docsBtn');
+    this.docsFooterBtn = document.getElementById('docsFooterBtn');
+    this.docsModal = document.getElementById('docsModal');
+    this.closeDocsBtn = document.getElementById('closeDocsBtn');
   }
 
   attachEventListeners() {
@@ -156,6 +162,25 @@ class JsonCompareUI {
     // Auto-format JSON on paste/input
     this.leftText.addEventListener('blur', () => this.formatJSON(this.leftText));
     this.rightText.addEventListener('blur', () => this.formatJSON(this.rightText));
+    
+    // Modal event listeners
+    this.docsBtn.addEventListener('click', () => this.openDocsModal());
+    this.docsFooterBtn.addEventListener('click', () => this.openDocsModal());
+    this.closeDocsBtn.addEventListener('click', () => this.closeDocsModal());
+    
+    // Close modal when clicking outside
+    this.docsModal.addEventListener('click', (e) => {
+      if (e.target === this.docsModal) {
+        this.closeDocsModal();
+      }
+    });
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !this.docsModal.classList.contains('hidden')) {
+        this.closeDocsModal();
+      }
+    });
   }
 
   async handleFileLoad(event, side) {
@@ -431,6 +456,17 @@ class JsonCompareUI {
       // If example loading fails, just leave inputs empty
       console.log('Could not load example data:', error);
     }
+  }
+  
+  // Modal methods
+  openDocsModal() {
+    this.docsModal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+  }
+  
+  closeDocsModal() {
+    this.docsModal.classList.add('hidden');
+    document.body.style.overflow = ''; // Restore scrolling
   }
 }
 

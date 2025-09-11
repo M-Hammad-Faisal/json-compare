@@ -7,9 +7,32 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <nav class="navbar">
+    <div class="nav-brand">
+      <h1>JSON Compare</h1>
+      <span class="version">v2.0</span>
+    </div>
+    <div class="nav-links">
+      <button id="docsBtn" class="nav-btn">📖 Docs</button>
+      <a href="https://github.com/M-Hammad-Faisal/json-compare" target="_blank" class="nav-btn github-btn">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+        GitHub
+      </a>
+    </div>
+  </nav>
+
   <header class="app-header">
-    <h1>JSON Compare — Web UI</h1>
-    <p>Load two JSON files or paste JSON and view a Git-like diff.</p>
+    <div class="hero-content">
+      <h2>Professional JSON Diff Tool</h2>
+      <p>Compare JSON files with Git-style side-by-side visualization</p>
+      <div class="feature-badges">
+        <span class="badge-feature">🔒 Privacy-First</span>
+        <span class="badge-feature">⚡ Real-time</span>
+        <span class="badge-feature">📱 Responsive</span>
+      </div>
+    </div>
   </header>
 
   <main class="container">
@@ -52,11 +75,77 @@
   </main>
 
   <footer class="app-footer">
-    <small>Runs fully in your browser — no uploads required.</small>
-    <div style="margin-top: 8px; color: #6c757d;">
-      Made with ❤️ by <a href="https://github.com/M-Hammad-Faisal" target="_blank" style="color: #667eea; text-decoration: none;">M-Hammad-Faisal</a>
+    <div class="footer-content">
+      <div class="footer-links">
+        <a href="https://github.com/M-Hammad-Faisal/json-compare/issues" target="_blank">Report Issues</a>
+        <span>·</span>
+        <a href="https://github.com/M-Hammad-Faisal/json-compare" target="_blank">Source Code</a>
+        <span>·</span>
+        <button id="docsFooterBtn" class="footer-link-btn">Documentation</button>
+      </div>
+      <div class="footer-credits">
+        Made with ❤️ by <a href="https://github.com/M-Hammad-Faisal" target="_blank">M-Hammad-Faisal</a>
+      </div>
     </div>
   </footer>
+
+  <!-- Documentation Modal -->
+  <div id="docsModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Documentation</h3>
+        <button id="closeDocsBtn" class="close-btn">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="docs-section">
+          <h4>🚀 Quick Start</h4>
+          <ol>
+            <li><strong>Upload JSON files</strong> using the file inputs or <strong>paste JSON</strong> directly into the text areas</li>
+            <li><strong>Click Compare</strong> to see the side-by-side diff with Git-style colors</li>
+            <li>Use the <strong>Swap button</strong> to quickly switch left and right positions</li>
+            <li><strong>Scroll through results</strong> to see all differences highlighted</li>
+          </ol>
+        </div>
+        
+        <div class="docs-section">
+          <h4>🎨 Color Legend</h4>
+          <div class="color-legend">
+            <div class="legend-item"><span class="color-box added"></span> <strong>Added</strong> - Content only in right JSON</div>
+            <div class="legend-item"><span class="color-box removed"></span> <strong>Removed</strong> - Content only in left JSON</div>
+            <div class="legend-item"><span class="color-box changed"></span> <strong>Changed</strong> - Different content in both files</div>
+            <div class="legend-item"><span class="color-box unchanged"></span> <strong>Unchanged</strong> - Identical content</div>
+          </div>
+        </div>
+
+        <div class="docs-section">
+          <h4>✨ Features</h4>
+          <ul>
+            <li><strong>🔒 Privacy-First</strong> - Everything runs in your browser, no uploads</li>
+            <li><strong>⚡ Real-time</strong> - Instant comparison as you paste or upload</li>
+            <li><strong>📱 Responsive</strong> - Works on desktop, tablet, and mobile</li>
+            <li><strong>🎨 Git-style</strong> - Professional diff visualization</li>
+            <li><strong>📁 File Support</strong> - Upload .json files or paste directly</li>
+          </ul>
+        </div>
+
+        <div class="docs-section">
+          <h4>⌨️ Command Line</h4>
+          <p>For developers who prefer CLI:</p>
+          <pre><code>git clone https://github.com/M-Hammad-Faisal/json-compare.git
+cd json-compare
+npm start file1.json file2.json</code></pre>
+        </div>
+
+        <div class="docs-section">
+          <h4>🌐 GitHub Pages</h4>
+          <p>This tool is hosted on GitHub Pages with automatic deployment. Fork the repository to create your own instance!</p>
+          <a href="https://github.com/M-Hammad-Faisal/json-compare" target="_blank" class="github-link">
+            View on GitHub →
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>
