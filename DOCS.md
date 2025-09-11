@@ -17,6 +17,9 @@
 
 The web interface provides an intuitive way to compare JSON files without any installation. Access it at [m-hammad-faisal.github.io/json-compare](https://m-hammad-faisal.github.io/json-compare/).
 
+![JSON Compare Interface](assets/Screenshot.png)
+*The professional web interface with side-by-side JSON comparison*
+
 ### Interface Overview
 
 **Input Methods**

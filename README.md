@@ -17,6 +17,14 @@
 
 JSON Compare is a powerful, browser-based tool for comparing JSON files with precise diff detection and professional visualization. Built with vanilla JavaScript and featuring GitHub-style side-by-side comparison.
 
+<div align="center">
+
+![JSON Compare Interface](assets/Screenshot.png)
+
+*Professional side-by-side JSON comparison with GitHub-style diff visualization*
+
+</div>
+
 ## Key Features
 
 ### Core Functionality
