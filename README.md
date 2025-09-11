@@ -35,6 +35,7 @@ JSON Compare is a powerful, browser-based tool for comparing JSON files with pre
 
 ### User Experience  
 - **Instant Comparison**: Real-time diff processing with no server required
+- **Dark/Light Theme**: Toggle between themes with persistent preference
 - **Mobile Responsive**: Optimized interface for all screen sizes
 - **Privacy Focused**: All processing happens locally in your browser
 - **Professional UI**: Clean, intuitive interface with helpful documentation
@@ -123,7 +124,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Export Options**: PDF and HTML diff reports
 - **Performance**: Large file optimization with chunking
 - **Customization**: Ignore patterns and custom rules  
-- **Themes**: Dark mode and color customization
 - **Advanced Features**: JSON schema validation and type checking
 
 ---

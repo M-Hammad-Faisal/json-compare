@@ -127,6 +127,10 @@ class JsonCompareUI {
     this.docsModal = document.getElementById('docsModal');
     this.closeDocsBtn = document.getElementById('closeDocsBtn');
     
+    // Mobile menu elements
+    this.mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    this.navLinks = document.getElementById('navLinks');
+    
     this.initializeTheme();
   }
 
@@ -141,6 +145,16 @@ class JsonCompareUI {
     this.docsBtn.addEventListener('click', () => this.openDocsModal());
     this.docsFooterBtn.addEventListener('click', () => this.openDocsModal());
     this.closeDocsBtn.addEventListener('click', () => this.closeDocsModal());
+    
+    // Mobile menu event listeners
+    this.mobileMenuToggle.addEventListener('click', () => this.toggleMobileMenu());
+    
+    // Close mobile menu when clicking nav links
+    this.navLinks.addEventListener('click', (e) => {
+      if (e.target.closest('.nav-btn')) {
+        this.closeMobileMenu();
+      }
+    });
     
     this.docsModal.addEventListener('click', (e) => {
       if (e.target === this.docsModal) {
@@ -169,6 +183,27 @@ class JsonCompareUI {
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('json-compare-theme', newTheme);
+  }
+  
+  toggleMobileMenu() {
+    const isActive = this.navLinks.classList.contains('active');
+    if (isActive) {
+      this.closeMobileMenu();
+    } else {
+      this.openMobileMenu();
+    }
+  }
+  
+  openMobileMenu() {
+    this.navLinks.classList.add('active');
+    this.mobileMenuToggle.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  
+  closeMobileMenu() {
+    this.navLinks.classList.remove('active');
+    this.mobileMenuToggle.classList.remove('active');
+    document.body.style.overflow = '';
   }
 
   async handleFileLoad(event, side) {
@@ -560,6 +595,11 @@ class JsonCompareUI {
   openDocsModal() {
     this.docsModal.classList.remove('hidden');
     document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    
+    // Close mobile menu if it's open
+    if (this.navLinks.classList.contains('active')) {
+      this.closeMobileMenu();
+    }
   }
   
   closeDocsModal() {

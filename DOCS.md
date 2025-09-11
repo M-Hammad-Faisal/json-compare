@@ -30,7 +30,8 @@ The web interface provides an intuitive way to compare JSON files without any in
 **Comparison Controls**
 - **Compare Button**: Initiates the diff analysis
 - **Swap Button**: Exchanges left and right inputs
-- **Clear Button**: Resets both input areas
+- **Theme Toggle**: Switch between light and dark themes (☀️/🌙)
+- **Documentation**: Access this guide and help information
 
 **Diff Visualization**
 - **Side-by-Side View**: GitHub-style comparison layout
@@ -41,12 +42,27 @@ The web interface provides an intuitive way to compare JSON files without any in
   - 🟡 **Yellow**: Modified lines
   - ⚪ **Gray**: Unchanged lines
 
+### Theme Support
+
+**Dark/Light Mode Toggle**
+- Click the ☀️/🌙 icon in the navigation bar to switch themes
+- Your preference is automatically saved and persists across sessions
+- Both themes provide optimal contrast for diff visualization
+- All UI elements adapt seamlessly to the selected theme
+
+**Theme Features**
+- **Light Theme**: Clean, professional appearance with high contrast
+- **Dark Theme**: Comfortable viewing in low-light environments  
+- **Smooth Transitions**: Animated theme changes for better UX
+- **Consistent Colors**: Diff colors maintain readability in both themes
+
 ### Best Practices
 
 1. **Format JSON**: Use pretty-printed JSON for better readability
 2. **Large Files**: Browser may slow with files >10MB
 3. **Privacy**: All processing happens locally - no data uploaded
 4. **Mobile Use**: Interface adapts to smaller screens
+5. **Theme Choice**: Use dark theme for extended comparison sessions
 
 ## Command Line Interface
 
@@ -191,6 +207,11 @@ npm run example  # Test the tool
 - Verify both inputs have content
 - Check browser console for JavaScript errors
 - Try refreshing the page
+
+**Theme Not Switching**
+- Ensure JavaScript is enabled in your browser
+- Check if localStorage is available (required for theme persistence)
+- Try clearing browser cache and reload
 
 ### Browser Compatibility
 
