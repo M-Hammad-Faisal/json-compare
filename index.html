@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JSON Compare — Web UI</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>JSON Compare — Web UI</h1>
+    <p>Load two JSON files or paste JSON and view a Git-like diff.</p>
+  </header>
+
+  <main class="container">
+    <section class="inputs">
+      <div class="input-card">
+        <h2>Left JSON</h2>
+        <input type="file" id="leftFile" accept=".json,application/json" />
+        <textarea id="leftText" placeholder="Paste left JSON here"></textarea>
+      </div>
+      <div class="input-card">
+        <h2>Right JSON</h2>
+        <input type="file" id="rightFile" accept=".json,application/json" />
+        <textarea id="rightText" placeholder="Paste right JSON here"></textarea>
+      </div>
+    </section>
+
+    <section class="actions">
+      <button id="compareBtn" class="primary">Compare</button>
+      <button id="swapBtn" class="secondary" title="Swap left/right">Swap</button>
+      <span id="status" class="status"></span>
+    </section>
+
+    <section id="summary" class="summary hidden"></section>
+
+    <section id="results" class="results hidden">
+      <div class="legend">
+        <span class="badge changed">Changed</span>
+        <span class="badge added">Added</span>
+        <span class="badge removed">Removed</span>
+        <span class="badge type">Type change</span>
+      </div>
+      <div id="diffView" class="diff-view">
+        <div class="diff-header">
+          <div class="diff-column left-column">Left JSON</div>
+          <div class="diff-column right-column">Right JSON</div>
+        </div>
+        <div id="diffContent" class="diff-content"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <small>Runs fully in your browser — no uploads required.</small>
+    <div style="margin-top: 8px; color: #6c757d;">
+      Made with ❤️ by <a href="https://github.com/M-Hammad-Faisal" target="_blank" style="color: #667eea; text-decoration: none;">M-Hammad-Faisal</a>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
+

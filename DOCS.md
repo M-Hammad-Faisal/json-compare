@@ -1,59 +1,29 @@
-# JSON Compare 📄
+# JSON Compare
 
-A beautiful web tool to compare JSON files with **Git-style side-by-side diff visualization**.
+A powerful tool to compare two JSON files and highlight the differences between them.
 
-<div align="center">
+## 🌐 Web Interface
 
-**[🚀 Launch Web App](index.html)** | **[📖 Full Documentation](DOCS.md)** | **[💻 CLI Version](#command-line)**
+**[🚀 Launch App](index.html)** | **[📖 Documentation](DOCS.md)**
 
-*No installation required - runs entirely in your browser!*
+A beautiful web interface with Git-style side-by-side diff visualization - no installation required!
 
-</div>
+## Features
 
-## ✨ Features
+### 🖥️ **Web Interface**
+- 🎨 **Git-like diff visualization** with side-by-side comparison
+- 📁 **File upload support** or paste JSON directly
+- 🔄 **Swap functionality** to quickly switch left/right
+- 📊 **Real-time comparison** with color-coded differences
+- 📱 **Responsive design** - works on desktop, tablet, and mobile
+- 🔒 **Privacy-first** - everything runs in your browser, no uploads
 
-- **🎨 Git-style diff** - Side-by-side comparison with syntax highlighting
-- **📁 File upload** or paste JSON directly  
-- **🔄 Swap functionality** - Quick left/right switching
-- **📊 Color-coded diffs** - 🟢 Added, 🔴 Removed, 🟡 Changed
-- **📱 Mobile responsive** - Works on any device
-- **🔒 Privacy-first** - No uploads, runs locally in browser
-- **🚀 Fast & lightweight** - No external dependencies
-
-## 🖥️ Screenshots
-
-*Side-by-side JSON comparison with line numbers and Git-style colors*
-
-![JSON Compare Screenshot](https://via.placeholder.com/800x400/667eea/white?text=JSON+Compare+Demo)
-
-## 🚀 Quick Start
-
-1. **[Open the web app](index.html)**
-2. **Upload JSON files** or **paste JSON** into the text areas
-3. **Click Compare** to see the side-by-side diff
-4. Use **Swap** to switch left/right positions
-
-## ⌨️ Command Line
-
-For developers who prefer CLI:
-
-```bash
-git clone https://github.com/M-Hammad-Faisal/json-compare.git
-cd json-compare
-npm start file1.json file2.json
-```
-
-[View full CLI documentation →](DOCS.md)
-
----
-
-<div align="center">
-
-Made with ❤️ by **[M-Hammad-Faisal](https://github.com/M-Hammad-Faisal)**
-
-*Like this project? Give it a ⭐ star!*
-
-</div>
+### ⌨️ **Command Line**
+- 🔍 **Deep comparison**: Recursively compares nested objects and arrays
+- 📊 **Clear output**: Shows exactly what changed, was added, or was removed
+- 🎯 **Path tracking**: Displays the exact path where differences occur
+- 🚀 **Fast and lightweight**: No external dependencies
+- 💻 **Cross-platform**: Works on Windows, macOS, and Linux
 
 ## Installation
 
