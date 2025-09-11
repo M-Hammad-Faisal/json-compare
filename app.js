@@ -346,9 +346,12 @@ class JsonCompareUI {
     // Use a simple but effective LCS-based diff algorithm
     const diffResult = this.createLineDiff(leftLines, rightLines);
     
+    // Enhance diff result with semantic type change information
+    const enhancedDiffResult = this.enhanceWithTypeChanges(diffResult, differences, leftLines, rightLines);
+    
     this.diffContent.innerHTML = '';
     
-    diffResult.forEach(line => {
+    enhancedDiffResult.forEach(line => {
       this.createDiffLine(
         line.leftLineNum,
         line.leftContent,
@@ -359,6 +362,41 @@ class JsonCompareUI {
     });
   }
   
+  enhanceWithTypeChanges(diffResult, differences, leftLines, rightLines) {
+    // Create a map of type changes by looking at the path and finding corresponding lines
+    const typeChangeMap = new Map();
+    
+    differences.filter(diff => diff.type === 'type_change').forEach(diff => {
+      const propertyName = diff.path.split('.').pop(); // Get the last part of the path
+      
+      // Find lines that contain this property in both left and right
+      for (let i = 0; i < diffResult.length; i++) {
+        const line = diffResult[i];
+        if (line.type === 'changed' && 
+            line.leftContent && line.rightContent &&
+            line.leftContent.includes(`"${propertyName}"`) &&
+            line.rightContent.includes(`"${propertyName}"`)) {
+          
+          // Mark this line as a type change
+          diffResult[i] = {
+            ...line,
+            type: 'type_change',
+            typeChangeInfo: {
+              property: propertyName,
+              leftType: typeof diff.left.value,
+              rightType: typeof diff.right.value,
+              leftValue: diff.left.value,
+              rightValue: diff.right.value
+            }
+          };
+          break;
+        }
+      }
+    });
+    
+    return diffResult;
+  }
+
   createLineDiff(leftLines, rightLines) {
     // Simple line-by-line diff using longest common subsequence approach
     const lcs = this.computeLCS(leftLines, rightLines);
@@ -572,7 +610,7 @@ class JsonCompareUI {
         "name": "John Doe",
         "age": 31,
         "city": "San Francisco", 
-        "hobbies": ["reading", "cycling", "photography"],
+        "hobbies": "swimming",
         "address": {
           "street": "456 Oak Ave",
           "zip": "10001",
