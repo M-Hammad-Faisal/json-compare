@@ -16,6 +16,7 @@
     .ads-sections { max-width:1200px; margin:0 auto; padding:16px; }
     .ads-section { margin-bottom:32px; }
     .ads-section h2 { margin:0 0 12px; font-size:1.1rem; color:var(--text-secondary); }
+    .ads-group-title { text-align:center; margin:24px 0 12px; font-size:1.2rem; color:var(--text-primary); }
     .ad-row { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; }
     .ad-card { background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:10px; padding:8px; display:inline-flex; align-items:center; justify-content:center; }
     .smartlinks { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:12px; }
@@ -37,13 +38,10 @@
 
   <header class="ads-header">
     <h2>Ads Showcase</h2>
-    <p>Responsive layout with 10 units per banner size.</p>
-    <div style="margin-top:12px;">
-      <a class="back-btn" href="index.html">← Back to JSON Compare</a>
-    </div>
   </header>
 
   <main class="ads-sections">
+    <h2 class="ads-group-title">Banners</h2>
     <!-- Banner 300x250 (10 units) -->
     <section class="ads-section">
       <h2>Banner 300×250</h2>
@@ -146,6 +144,7 @@
       </div>
     </section>
 
+    <h2 class="ads-group-title">Native Ads</h2>
     <!-- Native Banner (iframes ×10 using ads-native-unit.html) -->
     <section class="ads-section">
       <h2>Native Banner (×10)</h2>
@@ -163,6 +162,7 @@
       </div>
     </section>
 
+    <h2 class="ads-group-title">Smartlinks</h2>
     <!-- Smartlink (10 links) -->
     <section class="ads-section">
       <h2>Smartlink</h2>
