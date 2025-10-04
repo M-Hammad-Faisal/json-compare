@@ -162,43 +162,65 @@ class JsonCompareUI {
     // Mobile menu elements
     this.mobileMenuToggle = document.getElementById('mobileMenuToggle');
     this.navLinks = document.getElementById('navLinks');
+
+    // Presence flag for compare UI (used to guard bindings on non-compare pages)
+    this.hasCompareUI = !!(this.leftText || this.rightText || this.compareBtn || this.swapBtn);
     
     this.initializeTheme();
   }
 
   attachEventListeners() {
-    this.leftFile.addEventListener('change', (e) => this.handleFileLoad(e, 'left'));
-    this.rightFile.addEventListener('change', (e) => this.handleFileLoad(e, 'right'));
-    this.compareBtn.addEventListener('click', () => this.performComparison());
-    this.swapBtn.addEventListener('click', () => this.swapInputs());
-    this.leftText.addEventListener('blur', () => this.formatJSON(this.leftText));
-    this.rightText.addEventListener('blur', () => this.formatJSON(this.rightText));
-    this.themeToggle.addEventListener('click', () => this.toggleTheme());
-    this.docsBtn.addEventListener('click', () => this.openDocsModal());
-    this.docsFooterBtn.addEventListener('click', () => this.openDocsModal());
-    this.closeDocsBtn.addEventListener('click', () => this.closeDocsModal());
-    
-    // Mobile menu event listeners
-    this.mobileMenuToggle.addEventListener('click', () => this.toggleMobileMenu());
-    
-    // Close mobile menu when clicking nav links
-    this.navLinks.addEventListener('click', (e) => {
-      if (e.target.closest('.nav-btn')) {
-        this.closeMobileMenu();
+    try {
+      const on = (el, evt, handler) => {
+        if (el && typeof el.addEventListener === 'function') {
+          el.addEventListener(evt, handler);
+        }
+      };
+
+      // Bind compare-specific events only if compare UI exists
+      if (this.hasCompareUI) {
+        on(this.leftFile, 'change', (e) => this.handleFileLoad(e, 'left'));
+        on(this.rightFile, 'change', (e) => this.handleFileLoad(e, 'right'));
+        on(this.compareBtn, 'click', () => this.performComparison());
+        on(this.swapBtn, 'click', () => this.swapInputs());
+        on(this.leftText, 'blur', () => this.formatJSON(this.leftText));
+        on(this.rightText, 'blur', () => this.formatJSON(this.rightText));
       }
-    });
-    
-    this.docsModal.addEventListener('click', (e) => {
-      if (e.target === this.docsModal) {
-        this.closeDocsModal();
+
+      // Theme and docs (null-safe)
+      on(this.themeToggle, 'click', () => this.toggleTheme());
+      on(this.docsBtn, 'click', () => this.openDocsModal());
+      on(this.docsFooterBtn, 'click', () => this.openDocsModal());
+      on(this.closeDocsBtn, 'click', () => this.closeDocsModal());
+
+      // Mobile menu event listeners
+      on(this.mobileMenuToggle, 'click', () => this.toggleMobileMenu());
+
+      // Close mobile menu when clicking nav links
+      if (this.navLinks) {
+        this.navLinks.addEventListener('click', (e) => {
+          if (e.target.closest && e.target.closest('.nav-btn')) {
+            this.closeMobileMenu();
+          }
+        });
       }
-    });
-    
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !this.docsModal.classList.contains('hidden')) {
-        this.closeDocsModal();
-      }
-    });
+
+      // Modal backdrop click
+      on(this.docsModal, 'click', (e) => {
+        if (e.target === this.docsModal) {
+          this.closeDocsModal();
+        }
+      });
+
+      // Escape to close modal
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && this.docsModal && !this.docsModal.classList.contains('hidden')) {
+          this.closeDocsModal();
+        }
+      });
+    } catch (err) {
+      console.warn('attachEventListeners skipped due to missing elements:', err);
+    }
   }
 
   initializeTheme() {
@@ -218,6 +240,7 @@ class JsonCompareUI {
   }
   
   toggleMobileMenu() {
+    if (!this.navLinks || !this.mobileMenuToggle) return;
     const isActive = this.navLinks.classList.contains('active');
     if (isActive) {
       this.closeMobileMenu();
@@ -227,12 +250,14 @@ class JsonCompareUI {
   }
   
   openMobileMenu() {
+    if (!this.navLinks || !this.mobileMenuToggle) return;
     this.navLinks.classList.add('active');
     this.mobileMenuToggle.classList.add('active');
     document.body.style.overflow = 'hidden';
   }
   
   closeMobileMenu() {
+    if (!this.navLinks || !this.mobileMenuToggle) return;
     this.navLinks.classList.remove('active');
     this.mobileMenuToggle.classList.remove('active');
     document.body.style.overflow = '';
@@ -250,6 +275,7 @@ class JsonCompareUI {
     try {
       const text = await file.text();
       const textarea = side === 'left' ? this.leftText : this.rightText;
+      if (!textarea) return;
       textarea.value = text;
       this.formatJSON(textarea);
       this.showStatus(`Loaded ${file.name}`, 'success');
@@ -778,6 +804,8 @@ class JsonCompareUI {
 
   // Load example data for demo
   async loadExampleData() {
+    // Skip on pages without compare inputs
+    if (!this.leftText || !this.rightText) return;
     try {
       // Try to load the example files if available
       const leftExample = {
@@ -822,7 +850,7 @@ class JsonCompareUI {
     document.body.style.overflow = 'hidden'; // Prevent background scrolling
     
     // Close mobile menu if it's open
-    if (this.navLinks.classList.contains('active')) {
+    if (this.navLinks && this.navLinks.classList.contains('active')) {
       this.closeMobileMenu();
     }
   }
