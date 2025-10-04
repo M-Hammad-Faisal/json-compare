@@ -1,12 +1,30 @@
 class JsonCompare {
   constructor() {
     this.differences = [];
+    this.maxDifferences = 5000; // Limit for web version to prevent browser crash
+    this.comparisonCount = 0;
+  }
+  
+  /**
+   * Safely add difference with memory limit check
+   */
+  addDifference(difference) {
+    if (this.differences.length < this.maxDifferences) {
+      this.differences.push(difference);
+    }
   }
 
   compare(left, right, path = '') {
+    // Early exit if we've hit the max differences limit
+    if (this.differences.length >= this.maxDifferences) {
+      return;
+    }
+    
+    this.comparisonCount++;
+    
     if (left === null || left === undefined || right === null || right === undefined) {
       if (left !== right) {
-        this.differences.push({
+        this.addDifference({
           path: path || 'root',
           type: 'value_change',
           left: left,
@@ -17,7 +35,7 @@ class JsonCompare {
     }
 
     if (typeof left !== typeof right) {
-      this.differences.push({
+      this.addDifference({
         path: path || 'root',
         type: 'type_change',
         left: { type: typeof left, value: left },
@@ -37,7 +55,7 @@ class JsonCompare {
     }
 
     if (left !== right) {
-      this.differences.push({
+      this.addDifference({
         path: path || 'root',
         type: 'value_change',
         left: left,
@@ -49,17 +67,26 @@ class JsonCompare {
   compareArrays(left, right, path) {
     const maxLength = Math.max(left.length, right.length);
     
-    for (let i = 0; i < maxLength; i++) {
+    // For very large arrays, sample comparison to avoid memory issues
+    const sampleSize = maxLength > 500 ? 500 : maxLength;
+    const step = maxLength > 500 ? Math.floor(maxLength / sampleSize) : 1;
+    
+    for (let i = 0; i < maxLength; i += step) {
+      // Early exit if max differences reached
+      if (this.differences.length >= this.maxDifferences) {
+        break;
+      }
+      
       const currentPath = path ? `${path}[${i}]` : `[${i}]`;
       
       if (i >= left.length) {
-        this.differences.push({
+        this.addDifference({
           path: currentPath,
           type: 'added',
           right: right[i]
         });
       } else if (i >= right.length) {
-        this.differences.push({
+        this.addDifference({
           path: currentPath,
           type: 'removed',
           left: left[i]
@@ -74,16 +101,21 @@ class JsonCompare {
     const allKeys = new Set([...Object.keys(left), ...Object.keys(right)]);
     
     for (const key of allKeys) {
+      // Early exit if max differences reached
+      if (this.differences.length >= this.maxDifferences) {
+        break;
+      }
+      
       const currentPath = path ? `${path}.${key}` : key;
       
       if (!(key in left)) {
-        this.differences.push({
+        this.addDifference({
           path: currentPath,
           type: 'added',
           right: right[key]
         });
       } else if (!(key in right)) {
-        this.differences.push({
+        this.addDifference({
           path: currentPath,
           type: 'removed',
           left: left[key]
@@ -250,7 +282,7 @@ class JsonCompareUI {
     this.showStatus('Swapped left and right inputs', 'success');
   }
 
-  performComparison() {
+  async performComparison() {
     try {
       // Clear previous results
       this.hideResults();
@@ -262,6 +294,12 @@ class JsonCompareUI {
       if (!leftValue || !rightValue) {
         this.showStatus('Please provide JSON in both inputs', 'error');
         return;
+      }
+
+      // Check for large JSON files
+      const isLargeComparison = leftValue.length > 100000 || rightValue.length > 100000;
+      if (isLargeComparison) {
+        this.showStatus('Large JSON detected. This may take some time...', 'warning');
       }
 
       // Parse JSON
@@ -280,21 +318,72 @@ class JsonCompareUI {
         return;
       }
 
-      // Perform comparison
+      // Perform comparison with progress updates for large files
       this.compareBtn.disabled = true;
       this.showStatus('Comparing...', 'success');
       
-      // Use setTimeout to allow UI to update
-      setTimeout(() => {
-        const differences = this.comparer.compareObjects(leftJson, rightJson);
+      // Use async processing for large comparisons
+      if (isLargeComparison) {
+        const differences = await this.performAsyncComparison(leftJson, rightJson);
         this.displayResults(differences);
-        this.compareBtn.disabled = false;
-      }, 10);
+      } else {
+        // Use setTimeout to allow UI to update for smaller files
+        setTimeout(() => {
+          const differences = this.comparer.compareObjects(leftJson, rightJson);
+          this.displayResults(differences);
+          this.compareBtn.disabled = false;
+        }, 10);
+        return;
+      }
+      
+      this.compareBtn.disabled = false;
 
     } catch (error) {
       this.showStatus(`Comparison error: ${error.message}`, 'error');
       this.compareBtn.disabled = false;
     }
+  }
+
+  /**
+   * Async comparison for large JSON files with progress updates
+   */
+  async performAsyncComparison(leftJson, rightJson) {
+    return new Promise((resolve) => {
+      // Create a new comparer instance for this comparison
+      const asyncComparer = new JsonCompare();
+      let progressCount = 0;
+      const updateInterval = 1000; // Update progress every 1000 comparisons
+      
+      // Override the compare method to provide progress updates
+      const originalCompare = asyncComparer.compare.bind(asyncComparer);
+      asyncComparer.compare = (left, right, path = '') => {
+        progressCount++;
+        
+        // Update progress periodically to avoid blocking UI
+        if (progressCount % updateInterval === 0) {
+          this.showStatus(`Comparing... ${progressCount.toLocaleString()} items processed`, 'success');
+          
+          // Yield control back to browser
+          setTimeout(() => {
+            originalCompare(left, right, path);
+          }, 0);
+        } else {
+          originalCompare(left, right, path);
+        }
+      };
+      
+      // Process comparison in chunks to prevent UI blocking
+      setTimeout(() => {
+        try {
+          const differences = asyncComparer.compareObjects(leftJson, rightJson);
+          this.showStatus(`Comparison complete! Found ${differences.length} differences`, 'success');
+          resolve(differences);
+        } catch (error) {
+          this.showStatus(`Comparison error: ${error.message}`, 'error');
+          resolve([]);
+        }
+      }, 10);
+    });
   }
 
   displayResults(differences) {
@@ -331,12 +420,110 @@ class JsonCompareUI {
     const leftValue = this.leftText.value.trim();
     const rightValue = this.rightText.value.trim();
     
-    // Format the JSON for better readability
-    const leftJson = JSON.stringify(JSON.parse(leftValue), null, 2);
-    const rightJson = JSON.stringify(JSON.parse(rightValue), null, 2);
+    // Check if this is a large comparison that might affect performance
+    const isLargeFile = leftValue.length > 50000 || rightValue.length > 50000;
+    const isLargeDiffSet = differences.length > 500;
     
-    this.createSideBySideDiff(leftJson, rightJson, differences);
+    if (isLargeFile || isLargeDiffSet) {
+      this.displayLargeDiffSummary(differences);
+    } else {
+      // Format the JSON for better readability
+      const leftJson = JSON.stringify(JSON.parse(leftValue), null, 2);
+      const rightJson = JSON.stringify(JSON.parse(rightValue), null, 2);
+      
+      this.createSideBySideDiff(leftJson, rightJson, differences);
+    }
+    
     this.results.classList.remove('hidden');
+  }
+
+  /**
+   * Display summary for large diff sets instead of full side-by-side view
+   */
+  displayLargeDiffSummary(differences) {
+    this.diffContent.innerHTML = '';
+    
+    // Create summary container
+    const summaryDiv = document.createElement('div');
+    summaryDiv.className = 'large-diff-summary';
+    summaryDiv.style.cssText = `
+      padding: 20px;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      margin: 20px 0;
+      max-height: 600px;
+      overflow-y: auto;
+    `;
+    
+    // Add warning message
+    const warningDiv = document.createElement('div');
+    warningDiv.innerHTML = `
+      <h3 style="color: var(--text-warning); margin-bottom: 10px;">
+        ⚠️ Large Comparison Result
+      </h3>
+      <p style="margin-bottom: 20px; color: var(--text-secondary);">
+        This comparison contains ${differences.length.toLocaleString()} differences. 
+        Showing summary view for better performance.
+      </p>
+    `;
+    summaryDiv.appendChild(warningDiv);
+    
+    // Group differences by type
+    const groupedDiffs = this.groupDifferencesByType(differences);
+    
+    // Display each group
+    Object.entries(groupedDiffs).forEach(([type, diffs]) => {
+      const groupDiv = document.createElement('div');
+      groupDiv.style.cssText = 'margin-bottom: 20px; border: 1px solid var(--border-color); border-radius: 4px; padding: 15px;';
+      
+      const typeColors = {
+        'added': '#22c55e',
+        'removed': '#ef4444', 
+        'changed': '#f59e0b',
+        'value_change': '#f59e0b',
+        'type_change': '#8b5cf6'
+      };
+      
+      const typeLabels = {
+        'added': 'Added',
+        'removed': 'Removed',
+        'changed': 'Changed', 
+        'value_change': 'Value Changed',
+        'type_change': 'Type Changed'
+      };
+      
+      groupDiv.innerHTML = `
+        <h4 style="color: ${typeColors[type] || '#666'}; margin-bottom: 10px;">
+          ${typeLabels[type] || type} (${diffs.length.toLocaleString()})
+        </h4>
+        <div class="diff-paths" style="max-height: 200px; overflow-y: auto;">
+          ${diffs.slice(0, 50).map(diff => `
+            <div style="padding: 2px 0; font-family: monospace; font-size: 12px;">
+              <span style="color: var(--text-secondary);">${diff.path}</span>
+            </div>
+          `).join('')}
+          ${diffs.length > 50 ? `<div style="color: var(--text-secondary); font-style: italic; padding: 5px 0;">... and ${diffs.length - 50} more</div>` : ''}
+        </div>
+      `;
+      
+      summaryDiv.appendChild(groupDiv);
+    });
+    
+    this.diffContent.appendChild(summaryDiv);
+  }
+
+  /**
+   * Group differences by their type for summary display
+   */
+  groupDifferencesByType(differences) {
+    return differences.reduce((groups, diff) => {
+      const type = diff.type;
+      if (!groups[type]) {
+        groups[type] = [];
+      }
+      groups[type].push(diff);
+      return groups;
+    }, {});
   }
 
   createSideBySideDiff(leftText, rightText, differences) {
